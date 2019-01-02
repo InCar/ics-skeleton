@@ -1,0 +1,66 @@
+group 'com.incarcloud.ics'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.8
+
+repositories {
+    if (project.hasProperty("maven") && maven.equals("maven.aliyun.com"))
+        maven { url = 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    else
+        mavenCentral()
+        
+    dependencies{
+        // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
+        compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+        compile group: 'com.github.jsqlparser', name: 'jsqlparser', version: '1.3'
+    }
+
+}
+
+jar {
+    enabled = true
+}
+
+compileJava{
+    options.encoding = "utf-8"
+    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Werror"
+    options.compilerArgs << "-Xdiags:verbose"
+}
+
+compileTestJava{
+    options.encoding = "utf-8"
+    options.compilerArgs << "-Xlint:unchecked"
+    options.compilerArgs << "-Werror"
+    options.compilerArgs << "-Xdiags:verbose"
+}
+
+//发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
+publishing{
+    publications {
+        maven(MavenPublication){
+            from components.java
+        }
+    }
+    repositories {
+        maven{
+            url "${MAVEN_URL_SNAPSHOTS}"
+            credentials {
+                username "${MAVEN_AUTH_USERNAME}"
+                password "${MAVEN_AUTH_PASSWORD}"
+            }
+        }
+    }
+}
+
+ext {
+    MAVEN_URL_PUTLIC = 'https://repository.incarcloud.com/content/groups/public/'
+    MAVEN_URL_RELEASE = 'https://repository.incarcloud.com/content/repositories/releases/'
+    MAVEN_URL_SNAPSHOTS = 'https://repository.incarcloud.com/content/repositories/snapshots/'
+    MAVEN_AUTH_USERNAME = 'deployment'
+    MAVEN_AUTH_PASSWORD = 'deploy123456'
+}
+
