@@ -41,12 +41,15 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
                 throw BaseRuntimeException.getException(msg);
             }else{
                 try {
+                    if(!connection.isValid(0)){
+                        connection=getConnection();
+                    }
                     return function.apply(connection);
                 }finally {
                     pool.addFirst(connection);
                 }
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | SQLException e) {
             throw BaseRuntimeException.getException(e);
         }
     }
