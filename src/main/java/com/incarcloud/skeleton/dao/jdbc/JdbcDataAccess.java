@@ -42,7 +42,11 @@ public class JdbcDataAccess implements DataAccess<Connection>,Initializable{
             }else{
                 try {
                     if(!connection.isValid(0)){
-                        connection=getConnection();
+                        try{
+                            connection.close();
+                        }finally {
+                            connection=getConnection();
+                        }
                     }
                     return function.apply(connection);
                 }finally {
