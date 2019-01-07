@@ -10,9 +10,13 @@ import com.incarcloud.skeleton.config.Config;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * 静态资源处理器
@@ -45,24 +49,40 @@ public class DefaultResourceHandler implements ResourceHandler,Initializable {
         Config config= context.getConfig();
         //1、获取子路径
         String subPath=requestData.getSubPath();
-        //1.1、根据子路径和配置的静态文件请求路径、静态文件存放路径来拼装正确的静态文件相对地址
+        //1.1、根据子路径和配置的静态文件请求路径、额外的类路径静态文件存放路径、静态文件存放路径来拼装正确的静态文件相对地址
         String subFilePath=subPath.substring(config.getRequestStaticMappingPre().length());
-        String filePath=config.getFileStaticMappingPre()+subFilePath;
-        filePath=filePath.substring(1);
-        //2、读取静态文件内容
-        try(InputStream is=ClassLoader.getSystemResourceAsStream(filePath)){
-            if(is==null){
-                String msg="ResourceHandler path["+subPath+"] not exists";
-                config.getLogger().log(Level.SEVERE,msg);
-                throw BaseRuntimeException.getException(msg);
-            }
-            response.setCharacterEncoding(config.getEncoding());
-            response.setContentLength(is.available());
-            setResponseType(subPath,response);
-            FileUtil.write(is,response.getOutputStream());
-        } catch (IOException e) {
-            throw BaseRuntimeException.getException(e);
+        String[] extFileStaticMappingPres= config.getExtFileStaticMappingPres();
+        LinkedHashSet<String> fileStaticMappingPreSet;
+        if(extFileStaticMappingPres==null||extFileStaticMappingPres.length==0){
+            fileStaticMappingPreSet=new LinkedHashSet<>();
+        }else{
+            fileStaticMappingPreSet= Arrays.stream(extFileStaticMappingPres).collect(Collectors.toCollection(LinkedHashSet::new));
         }
+        fileStaticMappingPreSet.add(config.getFileStaticMappingPre());
+        //2、循环所有的类路径静态文件存放路径,依次检查每一个资源
+        List<String> filePathList=new ArrayList<>();
+        for (String fileStaticMappingPre : fileStaticMappingPreSet) {
+            String filePath=fileStaticMappingPre+subFilePath;
+            filePath=filePath.substring(1);
+            filePathList.add(filePath);
+            //2.1、读取静态文件内容
+            try(InputStream is=ClassLoader.getSystemResourceAsStream(filePath)){
+                //2.2、如果静态文件存在,则返回文件,并设置资源标记为true
+                if(is!=null){
+                    response.setCharacterEncoding(config.getEncoding());
+                    response.setContentLength(is.available());
+                    setResponseType(subPath,response);
+                    FileUtil.write(is,response.getOutputStream());
+                    return;
+                }
+            } catch (IOException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+        }
+        //3、如果有循环完了都没有资源,则抛出异常
+        String msg="ResourceHandler subPath["+subPath+"] mapping classPath["+filePathList.stream().reduce((e1,e2)->e1+","+e2).orElse("")+"] not exists";
+        config.getLogger().log(Level.SEVERE,msg);
+        throw BaseRuntimeException.getException(msg);
     }
 
     /**
@@ -71,7 +91,7 @@ public class DefaultResourceHandler implements ResourceHandler,Initializable {
      * @param response
      */
     private void setResponseType(String subPath,HttpServletResponse response){
-        int index= subPath.lastIndexOf(".");
+        int index= subPath.lastIndexOf('.');
         if(index!=-1){
             if(index<subPath.length()-1){
                 String suffix= subPath.substring(index+1).toLowerCase();

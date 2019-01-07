@@ -21,8 +21,10 @@ public class Config {
 
     //静态资源请求匹配前缀
     private String requestStaticMappingPre;
-    //静态资源文件路径匹配前缀
+    //静态资源类路径文件路径匹配前缀
     private String fileStaticMappingPre;
+    //额外静态资源类路径文件路径匹配前缀(优先级为 extFileStaticMappingPres>fileStaticMappingPre)
+    private String[] extFileStaticMappingPres;
 
     //response编码
     private String encoding;
@@ -132,6 +134,15 @@ public class Config {
 
     public Config withScanPackages(String... scanPackages) {
         this.scanPackages = scanPackages;
+        return this;
+    }
+
+    public String[] getExtFileStaticMappingPres() {
+        return extFileStaticMappingPres;
+    }
+
+    public Config withExtFileStaticMappingPres(String... extFileStaticMappingPres) {
+        this.extFileStaticMappingPres = extFileStaticMappingPres;
         return this;
     }
 }
