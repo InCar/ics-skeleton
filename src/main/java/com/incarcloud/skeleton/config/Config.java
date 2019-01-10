@@ -134,7 +134,7 @@ public class Config {
         return scanPackages;
     }
 
-    public Config withScanPackages(String... scanPackages) {
+    public Config addScanPackages(String... scanPackages) {
         if(scanPackages!=null&&scanPackages.length>0){
             List<String> scanPackageList = Arrays.stream(scanPackages).filter(scanPackage -> scanPackage != null && !"".equals(scanPackage.trim())).distinct().collect(Collectors.toList());
             if (!scanPackageList.isEmpty()) {
