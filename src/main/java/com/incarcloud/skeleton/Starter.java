@@ -14,7 +14,7 @@ public class Starter {
                 "root",
                 "maptracking");
         Config config=new Config().withJdbcConfig(mysqlConfig);
-        DefaultContext context=new DefaultContext(config).init();
+        DefaultContext context=new DefaultContext(config);
         return context;
     }
 

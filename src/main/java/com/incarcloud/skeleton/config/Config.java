@@ -3,7 +3,9 @@ package com.incarcloud.skeleton.config;
 
 import com.incarcloud.skeleton.log.LoggerFactory;
 
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Dispatcher配置类
@@ -133,7 +135,13 @@ public class Config {
     }
 
     public Config withScanPackages(String... scanPackages) {
-        this.scanPackages = scanPackages;
+        if(scanPackages!=null&&scanPackages.length>0){
+            List<String> scanPackageList = Arrays.stream(scanPackages).filter(scanPackage -> scanPackage != null && !"".equals(scanPackage.trim())).distinct().collect(Collectors.toList());
+            if (!scanPackageList.isEmpty()) {
+                scanPackageList.addAll(0,Arrays.asList(this.scanPackages));
+                this.scanPackages=scanPackageList.toArray(new String[scanPackageList.size()]);
+            }
+        }
         return this;
     }
 

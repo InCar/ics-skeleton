@@ -8,4 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface Context extends Configurable,Dispatcher,RequestHandler,ResourceHandler{
     void handle(HttpServletRequest request, HttpServletResponse response) throws NoHandlerException;
+
+    void init();
 }

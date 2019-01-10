@@ -39,7 +39,10 @@ public class DefaultContext implements Context,AutoScanner{
         this.config = config;
     }
 
-    public DefaultContext init() {
+    public void init() {
+        if(isInit){
+            throw BaseRuntimeException.getException("Context["+this.getClass()+"] Already Init");
+        }
         isInit=true;
         if(config==null){
             throw BaseRuntimeException.getException("Param[config] Must Not Be Null");
@@ -54,7 +57,6 @@ public class DefaultContext implements Context,AutoScanner{
         requestHandler=getBeanByName("requestHandler");
         //5、初始化所有组件
         initComponents();
-        return this;
     }
 
 
