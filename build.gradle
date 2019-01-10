@@ -1,5 +1,5 @@
 group 'com.incarcloud.ics'
-version '2.1-SNAPSHOT'
+version '2.5-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -38,11 +38,17 @@ compileTestJava{
     options.compilerArgs << "-Xdiags:verbose"
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    classifier "sources"
+}
+
 //发布到远程MAVEN仓库使用 gradle publishMavenPublicationToMavenRepository
 publishing{
     publications {
         maven(MavenPublication){
             from components.java
+            artifact(sourceJar)
         }
     }
     repositories {
