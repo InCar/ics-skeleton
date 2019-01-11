@@ -10,7 +10,7 @@ public class Starter {
     public static Context getContext(){
         JdbcConfig mysqlConfig=new JdbcConfig(
                 JdbcDataAccess.MYSQL_DRIVER_CLASS_NAME_8,
-                "jdbc:mysql://47.98.211.203:3306/test?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=UTC&autoReconnect=true",
+                "jdbc:mysql://47.98.211.203:3306/test?characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true&serverTimezone=CTT&autoReconnect=true",
                 "root",
                 "maptracking");
         Config config=new Config().withJdbcConfig(mysqlConfig);
