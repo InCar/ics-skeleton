@@ -26,7 +26,7 @@ public class ArrayParamConverter implements ICSHttpParamConverter{
         }else if(Date.class.isAssignableFrom(arrayType)){
             subConverter=DateParamConverter.INSTANCE;
         }else{
-            String arrStr=Arrays.stream(source).reduce((e1,e2)->e1+","+e2).get();
+            String arrStr=Arrays.stream(source).reduce((e1,e2)->e1+","+e2).orElse("");
             throw BaseRuntimeException.getException("ArrayParamConverter Type["+targetType.getName()+"] Value["+arrStr+"] Not Support");
         }
         Object arr= Array.newInstance(arrayType,source.length);
