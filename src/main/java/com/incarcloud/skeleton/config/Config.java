@@ -38,6 +38,7 @@ public class Config {
     //mysql连接配置
     private DataSource dataSource;
     private JdbcConfig jdbcConfig;
+    private HBaseConfig hBaseConfig;
 
     //扫面ics组件的包路径
     private String[] scanPackages;
@@ -151,6 +152,16 @@ public class Config {
 
     public Config withExtFileStaticMappingPres(String... extFileStaticMappingPres) {
         this.extFileStaticMappingPres = extFileStaticMappingPres;
+        return this;
+    }
+
+    public HBaseConfig getHBaseConfig() {
+        return hBaseConfig;
+    }
+
+    public Config withHBaseConfig(HBaseConfig hBaseConfig) {
+        this.dataSource=DataSource.HBase;
+        this.hBaseConfig = hBaseConfig;
         return this;
     }
 }
